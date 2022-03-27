@@ -413,17 +413,29 @@
                         _this.scrollActiveSong()
                     }
 
-                    // Xử lí bật / tắt random song
-                    randomBtn.onclick = function() {
-                        _this.isRandom = !_this.isRandom
-                        _this.setConfig('isRandom', _this.isRandom)
-                        randomBtn.classList.toggle('active', _this.isRandom)
+                     // Xử lí bật / tắt random song
+                    randomBtn.onclick = function () {
+                        if(_this.isRepeat){
+                            _this.isRepeat = !_this.isRepeat
+                            _this.setConfig('isRepeat',_this.isRepeat)
+                            repeatBtn.classList.toggle('active', _this.isRepeat)
+
+                        }
+                            _this.isRandom = !_this.isRandom
+                            _this.setConfig('isRandom',_this.isRandom)
+                            randomBtn.classList.toggle('active', _this.isRandom)
                     }
 
                     // Xử lí bật / tắt repeat song
-                    repeatBtn.onclick = function() {
+                    repeatBtn.onclick = function () {
+                        if(_this.isRandom){
+                            _this.isRandom = !_this.isRandom
+                            _this.setConfig('isRandom', _this.isRandom)
+                            randomBtn.classList.toggle('active', _this.isRandom)
+
+                        }
                         _this.isRepeat = !_this.isRepeat
-                        _this.setConfig('isRepeat', _this.isRepeat)
+                        _this.setConfig('isRepeat',_this.isRepeat)
                         repeatBtn.classList.toggle('active', _this.isRepeat)
                     }
 
