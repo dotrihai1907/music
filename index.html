@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Music Player</title>
+        <link rel="shortcut icon" href="./assets/img/icon.png" type="image/x-icon">
+        <link rel="stylesheet" href="./assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="player">
+            <!-- Dashboard -->
+            <div class="dashboard">
+            <!-- Header -->
+            <header>
+                <h4>Now playing:</h4>
+                <h2>String 57th & 9th</h2>
+            </header>
+        
+            <!-- CD -->
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+                </div>
+            </div>
+        
+            <!-- Control -->
+            <div class="control">
+                <div class="btn btn-repeat">
+                <i class="fas fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="btn btn-toggle-play">
+                <i class="fas fa-pause icon-pause"></i>
+                <i class="fas fa-play icon-play"></i>
+                </div>
+                <div class="btn btn-next">
+                <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                <i class="fas fa-random"></i>
+                </div>
+            </div>
+        
+            <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+        
+            <audio id="audio" src=""></audio>
+            </div>
+        
+            <!-- Playlist -->
+            <div class="playlist"></div>
+        </div>
+
+        <script>
+            const $ = document.querySelector.bind(document);
+            const $$ = document.querySelectorAll.bind(document);
+
+            const PLAYER_STORAGE_KEY = 'MUSIC PLAYER';
+
+            const player = $('.player');
+            const cd = $('.cd');
+            const heading = $('header h2');
+            const cdThumb = $('.cd-thumb');
+            const audio = $('#audio');
+            const playBtn = $('.btn-toggle-play');
+            const progress = $('#progress');
+            const prevBtn = $('.btn-prev');
+            const nextBtn = $('.btn-next');
+            const randomBtn = $('.btn-random');
+            const repeatBtn = $('.btn-repeat');
+            const playlist = $('.playlist');
+
+            const app = {
+                currentIndex: 0,
+                isPlaying: false,
+                isRandom: false,
+                isRepeat: false,
+                config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},                
+                songs: [
+                    {
+                        name: 'All Of The Stars',
+                        singer: 'Ed Sheeran',
+                        path: './assets/music/song1.mp3',
+                        image: './assets/img/song1.jpg'
+                    },
+                    {
+                        name: 'Arcade',
+                        singer: 'Ducan Laurence',
+                        path: './assets/music/song2.mp3',
+                        image: './assets/img/song2.jpg'
+                    },
+                    {
+                        name: 'Bad Blood',
+                        singer: 'Taylor Swift ft. Kendrick Lamar',
+                        path: './assets/music/song3.mp3',
+                        image: './assets/img/song3.jpg'
+                    },
+                    {
+                        name: 'Bang Bang',
+                        singer: 'Ariana Grande ft. Jessie J, Nicki Minaj',
+                        path: './assets/music/song4.mp3',
+                        image: './assets/img/song4.jpg'
+                    },
+                    {
+                        name: 'Because Of You',
+                        singer: 'Kelly Clarkson',
+                        path: './assets/music/song5.mp3',
+                        image: './assets/img/song5.jpg'
+                    },
+                    {
+                        name: 'Blank Space',
+                        singer: 'Taylor Swift',
+                        path: './assets/music/song6.mp3',
+                        image: './assets/img/song6.jpg'
+                    },
+                    {
+                        name: 'Born To Die',
+                        singer: 'Lana Del Rey',
+                        path: './assets/music/song7.mp3',
+                        image: './assets/img/song7.jpg'
+                    },
+                    {
+                        name: 'Butterfiles',
+                        singer: 'Kacey Musgraves',
+                        path: './assets/music/song8.mp3',
+                        image: './assets/img/song8.jpg'
+                    },
+                    {
+                        name: 'Close',
+                        singer: 'Nick Jonas ft. Tove Lo',
+                        path: './assets/music/song9.mp3',
+                        image: './assets/img/song9.jpg'
+                    },
+                    {
+                        name: 'Colors Of The Wind',
+                        singer: 'Tori Kelly',
+                        path: './assets/music/song10.mp3',
+                        image: './assets/img/song10.jpg'
+                    },
+                    {
+                        name: 'Diamonds',
+                        singer: 'Rihanna',
+                        path: './assets/music/song11.mp3',
+                        image: './assets/img/song11.jpeg'
+                    },
+                    {
+                        name: 'Dusk Till Dawn',
+                        singer: 'Zayn ft. Sia',
+                        path: './assets/music/song12.mp3',
+                        image: './assets/img/song12.jpg'
+                    },
+                    {
+                        name: 'Fancy',
+                        singer: 'Iggy Azalea ft. Charli XCX',
+                        path: './assets/music/song13.mp3',
+                        image: './assets/img/song13.jpg'
+                    },
+                    {
+                        name: 'Fire',
+                        singer: 'Gavin DeGraw',
+                        path: './assets/music/song14.mp3',
+                        image: './assets/img/song14.jpg'
+                    },
+                    {
+                        name: 'Fire On Fire',
+                        singer: 'Sam Smith',
+                        path: './assets/music/song15.mp3',
+                        image: './assets/img/song15.jpg'
+                    },
+                    {
+                        name: 'Flashlight',
+                        singer: 'Jessie J',
+                        path: './assets/music/song16.mp3',
+                        image: './assets/img/song16.jpg'
+                    },
+                    {
+                        name: 'Halo',
+                        singer: 'Beyoncé',
+                        path: './assets/music/song17.mp3',
+                        image: './assets/img/song17.jpg'
+                    },
+                    {
+                        name: 'I Knew You Were Trouble',
+                        singer: 'Taylor Swift',
+                        path: './assets/music/song18.mp3',
+                        image: './assets/img/song18.jpg'
+                    },
+                    {
+                        name: 'I Know Places',
+                        singer: 'Taylor Swift',
+                        path: './assets/music/song19.mp3',
+                        image: './assets/img/song19.jpg'
+                    },
+                    {
+                        name: 'Just Give Me A Reason',
+                        singer: 'P!NK ft. Nate Ruess',
+                        path: './assets/music/song20.mp3',
+                        image: './assets/img/song20.jpg'
+                    },
+                    {
+                        name: 'Legendary Lovers',
+                        singer: 'Katy Perry',
+                        path: './assets/music/song21.mp3',
+                        image: './assets/img/song21.jpg'
+                    },
+                    {
+                        name: 'Let It Go',
+                        singer: 'Demi Lovato',
+                        path: './assets/music/song22.mp3',
+                        image: './assets/img/song22.jpg'
+                    },
+                    {
+                        name: 'Me And My Broken Heart',
+                        singer: 'Rixton',
+                        path: './assets/music/song23.mp3',
+                        image: './assets/img/song23.jpg'
+                    },
+                    {
+                        name: 'Mystery Of Love',
+                        singer: 'Sufjan Stevens',
+                        path: './assets/music/song24.mp3',
+                        image: './assets/img/song24.jpg'
+                    },
+                    {
+                        name: 'No More Sad Songs',
+                        singer: 'Little Mix ft. Machine Gun Kelly',
+                        path: './assets/music/song25.mp3',
+                        image: './assets/img/song25.jpg'
+                    },
+                    {
+                        name: 'Outlaws Of Love',
+                        singer: 'Adam Lambert',
+                        path: './assets/music/song25.1.mp3',
+                        image: './assets/img/song25.1.jpg'
+                    },
+                    {
+                        name: 'Outside',
+                        singer: 'Calvin Harris ft. Ellie Goulding',
+                        path: './assets/music/song26.mp3',
+                        image: './assets/img/song26.jpg'
+                    },
+                    {
+                        name: 'Paper Heart',
+                        singer: 'Tori Kelly',
+                        path: './assets/music/song27.mp3',
+                        image: './assets/img/song27.jpg'
+                    },
+                    {
+                        name: 'Pieces',
+                        singer: 'Rob Thomas',
+                        path: './assets/music/song28.mp3',
+                        image: './assets/img/song28.jpg'
+                    },
+                    {
+                        name: 'Play Date',
+                        singer: 'Malanie Martinez',
+                        path: './assets/music/song29.mp3',
+                        image: './assets/img/song29.jpg'
+                    },
+                    {
+                        name: 'Safe And Sound',
+                        singer: 'Taylor Swift',
+                        path: './assets/music/song30.mp3',
+                        image: './assets/img/song30.jpg'
+                    },
+                    {
+                        name: 'Same Old Love',
+                        singer: 'Selena Gomez',
+                        path: './assets/music/song31.mp3',
+                        image: './assets/img/song31.jpg'
+                    },
+                    {
+                        name: 'Side To Side',
+                        singer: 'Ariana Grande ft. Nicki Minaj',
+                        path: './assets/music/song32.mp3',
+                        image: './assets/img/song32.jpg'
+                    },
+                    {
+                        name: 'So Far Away',
+                        singer: 'Martin Garrix ft. David Guetta',
+                        path: './assets/music/song33.mp3',
+                        image: './assets/img/song33.jpg'
+                    },
+                    {
+                        name: 'Speak Now',
+                        singer: 'Taylor Swift',
+                        path: './assets/music/song34.mp3',
+                        image: './assets/img/song34.jpg'
+                    },
+                    {
+                        name: 'Speechless',
+                        singer: 'Naomi Scott',
+                        path: './assets/music/song35.mp3',
+                        image: './assets/img/song35.jpg'
+                    }
+                ],
+                setConfig: function(key, value) {
+                    this.config[key] = value;
+                    localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config))
+                },
+                render: function() {
+                    const htmls = this.songs.map((song, index) => {
+                        return `
+                            <div class="song ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
+                                <div class="thumb" style="background-image: url('${song.image}')"></div>
+                                <div class="body">
+                                    <h3 class="title">${song.name}</h3>
+                                    <p class="author">${song.singer}</p>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </div>
+                            </div>
+                        `                       
+                    })
+                    playlist.innerHTML = htmls.join('\n')
+                },
+                definePropeties: function() { // định nghĩ ra curentSong
+                    Object.defineProperty(this, 'currentSong', {
+                        get: function() {
+                            return this.songs[this.currentIndex]
+                        }
+                    })
+                },
+                handleEvents: function() {
+                    const _this = this
+                    const cdWidth = cd.offsetWidth
+
+                    // Xử lí CD quay / dừng
+                    const cdThumbAnimate = cdThumb.animate([
+                        {transform: 'rotate(360deg'}
+                    ], {
+                        duration: 30000, //10 seconds
+                        iterations: Infinity
+                    })
+                    cdThumbAnimate.pause()
+
+
+                    // Xử lí zoom đĩa CD
+                    document.onscroll = function() {
+                        const scrollTop = window.scrollY || (document.documentElement.scrollTop);
+                        const newCdWidth = cdWidth - scrollTop;
+
+                        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0;
+                        cd.style.opacity = newCdWidth / cdWidth;
+                    }
+
+                    // Xử lí khi click nút Play
+                    playBtn.onclick = function() {
+                        if (_this.isPlaying) {
+                            audio.pause()              
+                        } else {
+                            audio.play()
+                        }
+                    }
+
+                    // Khi song được play
+                    audio.onplay = function() {
+                        _this.isPlaying = true
+                        player.classList.add('playing')
+                        cdThumbAnimate.play()
+                    }
+
+                    // Khi song bị pause
+                    audio.onpause = function() {
+                        _this.isPlaying = false
+                        player.classList.remove('playing')
+                        cdThumbAnimate.pause()
+                    }
+
+                    // Khi tiến độ bài hát thay đổi
+                    audio.ontimeupdate = function() {
+                        if (audio.duration) {
+                            const progressPercent = Math.floor(audio.currentTime / audio.duration *100)
+                            progress.value = progressPercent
+                        }
+                         
+                    }
+
+                    // Xử lí khi tua song
+                    progress.oninput = function(e) {
+                        const seekTime = e.target.value / 100 * audio.duration
+                        audio.currentTime = seekTime
+                        audio.play()
+                    }
+
+                    // Khi next song
+                    nextBtn.onclick = function() {
+                        if (_this.isRandom) {
+                            _this.randomSong()
+                        } else {
+                            _this.nextSong()
+                        }
+                        audio.play()
+                        _this.render()
+                        _this.scrollActiveSong()
+                    }
+
+                     // Khi prev song
+                    prevBtn.onclick = function() {
+                        if(_this.isRandom) {
+                            _this.randomSong()
+                        } else {
+                            _this.prevSong()
+                        }
+                        audio.play()
+                        _this.render()
+                        _this.scrollActiveSong()
+                    }
+
+                    // Xử lí bật / tắt random song
+                    randomBtn.onclick = function() {
+                        _this.isRandom = !_this.isRandom
+                        _this.setConfig('isRandom', _this.isRandom)
+                        randomBtn.classList.toggle('active', _this.isRandom)
+                    }
+
+                    // Xử lí bật / tắt repeat song
+                    repeatBtn.onclick = function() {
+                        _this.isRepeat = !_this.isRepeat
+                        _this.setConfig('isRepeat', _this.isRepeat)
+                        repeatBtn.classList.toggle('active', _this.isRepeat)
+                    }
+
+                    // Xử lí khi audio ended
+                    audio.onended = function() {
+                        if (_this.isRepeat) {
+                            audio.play()
+                        } else {
+                            nextBtn.click()
+                        }
+                    }
+
+                    // Lắng nghe hành vi click vào playlist
+                    playlist.onclick = function(e) {
+                        const songNode = e.target.closest('.song:not(.active)')
+
+                        if (songNode || e.target.closest('.option')) {
+                            // Xử lí khi click vào song
+                            if (e.target.closest('.song:not(.active')) {
+                                _this.currentIndex = Number(songNode.dataset.index)
+                                _this.loadCurrentSong()
+                                _this.render()
+                                audio.play()
+                            }
+                            // Xử lí khi click vào option
+                            if (e.target.closest('.option')) {}
+                        }
+                    }                    
+                },
+
+                // Phần xử lí của hệ thống sau khi ấn chức năng
+                scrollActiveSong: function() {
+                    setTimeout(function() {
+                        $('.song.active').scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }, 300)
+                },
+                loadCurrentSong: function() {
+                    heading.textContent = this.currentSong.name;
+                    cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+                    audio.src = this.currentSong.path;
+                },
+                loadConfig: function() {
+                    this.isRandom = this.config.isRandom
+                    this.isRepeat = this.config.isRepeat
+                },
+                nextSong: function() {
+                    this.currentIndex++
+                    if (this.currentIndex >= this.songs.length) {
+                        this.currentIndex = 0
+                    }
+                    this.loadCurrentSong()
+                },
+                prevSong: function() {
+                    this.currentIndex--
+                    if (this.currentIndex < 0) {
+                        this.currentIndex = this.songs.length - 1
+                    }
+                    this.loadCurrentSong()
+                },
+                randomSong: function() {
+                    let newIndex 
+                    do {
+                        newIndex = Math.floor(Math.random() * this.songs.length)
+                    } while (newIndex === this.currentIndex)
+                    this.currentIndex = newIndex
+                    this.loadCurrentSong()
+                },       
+                start: function() {
+                    // Gán cấu hình từ config vào ứng dụng
+                    this.loadConfig()
+
+                    // Định nghĩa các thuộc tính cho object
+                    this.definePropeties()
+
+                    // Lắng nghe/ Xử lý các sự kiện (DOM events)
+                    this.handleEvents()
+
+                    // Tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
+                    this.loadCurrentSong()
+
+                    // Render playlist
+                    this.render()
+
+                    // Hiển thị trạng thái ban đầu của button random vaf repeat
+                    randomBtn.classList.toggle('active', this.isRandom)
+                    repeatBtn.classList.toggle('active', this.isRepeat)
+                }
+            }
+
+            app.start()
+        </script>
+    </body>
+</html>
+
