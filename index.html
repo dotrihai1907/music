@@ -379,7 +379,6 @@
                             const progressPercent = Math.floor(audio.currentTime / audio.duration *100)
                             progress.value = progressPercent
                         }
-                         
                     }
 
                     // Xử lí khi tua song
@@ -413,7 +412,7 @@
                         _this.scrollActiveSong()
                     }
 
-                     // Xử lí bật / tắt random song
+                    // Xử lí bật / tắt random song
                     randomBtn.onclick = function () {
                         if(_this.isRepeat){
                             _this.isRepeat = !_this.isRepeat
